@@ -1,0 +1,31 @@
+CREATE DATABASE IF NOT EXISTS `maestranzas`;
+USE maestranzas;
+
+CREATE TABLE IF NOT EXISTS `roles` (
+  `role_id` int(30) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `roles` (`role_id`, `name`) VALUES
+(1, 'admin'),
+(2, 'editor'),
+(3, 'visor');
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `run` varchar(12) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`),
+  KEY `role_id` (`role_id`),
+  CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `users` (`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
+('admin', 'admin', 'admin', '111111111', 'admin123', 1),
+('editor', '', '', '', '123456', 2),
+('visor', '', '', '', '123456', 3);
