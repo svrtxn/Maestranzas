@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
 ('admin', 'admin', 'admin', '111111111', 'admin123', 1),
-('editor', '', '', '', '123456', 2),
-('visor', '', '', '', '123456', 3);
+('editor', 'editor', '', '', 'editor123', 2),
+('visor', 'visor', '', '', 'visor123', 3);

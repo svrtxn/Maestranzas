@@ -1,29 +1,6 @@
 const productForm = document.getElementById("product-form");
 const productAlert = document.getElementById("product-alert");
 
-// Función para generar productos ficticios y agregarlos al localStorage
-function generateDummyProducts(numProducts) {
-  const dummyProducts = [];
-  const categories = ["Category 1", "Category 2", "Category 3", "Category 4"];
-
-  for (let i = 1; i <= numProducts; i++) {
-    const newProduct = {
-      id: `ABC${i}`,
-      name: `Product ${i}`,
-      desc: `Description of Product ${i}`,
-      ubi: `Location ${i}`,
-      cant: Math.floor(Math.random() * 10) + 1, // Random quantity between 1 and 10
-      pdf: "",
-      categ: categories[Math.floor(Math.random() * categories.length)] // Random category from the array
-    };
-    dummyProducts.push(newProduct);
-  }
-  setProductsInLocalStorage(dummyProducts);
-}
-
-// Llamar a la función para generar 100 productos ficticios
-generateDummyProducts(50);
-
 productForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
