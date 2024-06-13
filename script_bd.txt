@@ -1,3 +1,9 @@
+--------------------------------------------------------------------------------------------------------
+-- EJECUTAR ESTA SECCIÓN PRIMERO
+-------------------------------------------------------------------------------------------------------- 
+
+DROP DATABASE maestranzas;
+
 CREATE DATABASE IF NOT EXISTS `maestranzas`;
 USE maestranzas;
 
@@ -12,6 +18,41 @@ INSERT INTO `roles` (`role_id`, `name`) VALUES
 (2, 'editor'),
 (3, 'visor');
 
+CREATE TABLE IF NOT EXISTS `supplier` (
+  `supp_id` int(30) NOT NULL,
+  `supp_name` varchar(255) NOT NULL,
+  `start_cont` varchar(255) NOT NULL,
+  `renew_cont` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `contact` varchar(255) NOT NULL,
+  `transactions` varchar(255) NOT NULL,
+  PRIMARY KEY (`supp_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `categories` (
+  `cat_id` int(30) NOT NULL,
+  `cat_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`cat_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Insert categories into the categories table
+INSERT INTO `categories` (`cat_id`, `cat_name`) VALUES
+(1, 'Herramienta Manual'),
+(2, 'Herramienta Eléctrica'),
+(3, 'Jardinería'),
+(4, 'Construcción'),
+(5, 'Fijación'),
+(6, 'Suministros Eléctricos'),
+(7, 'Pintura y Acabado'),
+(8, 'Fontanería'),
+(9, 'Decoración');
+
+--------------------------------------------------------------------------------------------------------
+-- EJECUTAR ESTA SECCIÓN SEGUNDO
+-- TODAS LAS LINEAS POSTERIORES TIENEN QUE SER EJECUTADAS 
+-- DENTRO DE LA SENTENCIA SQL DE LA BBDD
+-------------------------------------------------------------------------------------------------------- 
+
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
@@ -25,7 +66,44 @@ CREATE TABLE IF NOT EXISTS `users` (
   CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `users` (`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
-('admin', 'admin', 'admin', '111111111', 'admin123', 1),
-('editor', 'editor', '', '', 'editor123', 2),
-('visor', 'visor', '', '', 'visor123', 3);
+--------------------------------------------------------------------------------------------------------
+-- EJECUTAR ESTA SECCIÓN TERCERO
+-------------------------------------------------------------------------------------------------------- 
+
+INSERT INTO `users` (`user_id`,`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
+('','admin', 'admin', 'admin', '111111111', 'admin', 1),
+('','editor', 'editor', 'editor', '222222222', 'editor', 2),
+('','visor', 'visor', 'visor', '3333333333', 'visor', 3);
+
+--------------------------------------------------------------------------------------------------------
+-- EJECUTAR ESTA SECCIÓN CUARTO
+-------------------------------------------------------------------------------------------------------- 
+
+DELIMITER $$
+
+CREATE TRIGGER generar_usuario
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+    SET NEW.username = CONCAT(LEFT(NEW.first_name, 3), '.', NEW.last_name);
+END$$
+
+DELIMITER ;
+
+--------------------------------------------------------------------------------------------------------
+-- EJECUTAR ESTA SECCIÓN QUINTO
+-------------------------------------------------------------------------------------------------------- 
+
+CREATE TABLE IF NOT EXISTS `products` (
+  `prod_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name_prod` varchar(255) NOT NULL,
+  `desc_prod` varchar(255) NOT NULL,
+  `price` int(11) NOT NULL,
+  `supplier` int(30) NOT NULL,
+  `category` int(30) NOT NULL,
+  `stock` int(11) NOT NULL,
+  `img` blob NOT NULL,
+  PRIMARY KEY (`prod_id`),
+  CONSTRAINT `fk_supplier_id` FOREIGN KEY (`supplier`) REFERENCES `supplier` (`supp_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_category_id` FOREIGN KEY (`category`) REFERENCES `categories` (`cat_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
