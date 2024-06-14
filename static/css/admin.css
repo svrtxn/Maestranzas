@@ -6,6 +6,7 @@
     z-index: 100;
     padding: 48px 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 16%;
 }
 
 .sidebar-header {
@@ -13,10 +14,12 @@
     align-items: center;
     margin-bottom: 2rem;
     margin-left: 1rem;
+    max-width: 16%;
 }
 
 .sidebar-header p {
     margin-top: 12px;
+
 }
 
 .sidebar-header i {
@@ -25,11 +28,17 @@
 }
 
 
+.contenido {
+    padding: 20px;
+    margin-left: 16%;
+}
+
 .user-info {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     margin-left: 1rem;
+
 }
 
 .user-info p {
@@ -64,12 +73,27 @@
     margin-top: 2rem;
 }
 
-.container-users {
-    padding: 20px;
-    margin-left: 250px;
 
-}
 
 .users-table {
     margin-top: 20px;
+}
+
+.col-md-6 label {
+    display: block;
+}
+
+#inputRun,
+#inputDv {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 10px;
+}
+
+#inputRun {
+    width: calc(100% - 100px);
+}
+
+#inputDv {
+    width: 50px;
 }

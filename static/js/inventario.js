@@ -15,17 +15,8 @@ function loadProducts() {
 
 // AGREGAR PRODUCTO A TABLA
 
-// Contenido de tu_archivo_js.js
-document.addEventListener('DOMContentLoaded', function () {
-  // La variable is_editor es definida en la plantilla Flask
-  if (is_editor) {
-    console.log("Eres un editor");
-    // Haz lo que necesites hacer si es un editor
-  } else {
-    console.log("No eres un editor");
-    // Haz lo que necesites hacer si no es un editor
-  }
-});
+
+
 
 function addProductToTable(product) {
   const row = document.createElement("tr");
