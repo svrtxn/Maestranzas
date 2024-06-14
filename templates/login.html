@@ -46,12 +46,30 @@
                         </div>
                         <input type="password" class="form-control" id="inputPassword" placeholder="Ingresa contraseña"
                             name="inputPassword">
+                        <button class="btn btn-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </div>
                 </div>
+
                 <button type="submit" class="btn btn-primary btn-block p-2 btn-submit">INGRESAR</button>
             </form>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const togglePasswordButton = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('inputPassword');
+
+        togglePasswordButton.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePasswordButton.querySelector('i').classList.toggle('bi-eye');
+            togglePasswordButton.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    </script>
+
+
 </body>
 
 </html>

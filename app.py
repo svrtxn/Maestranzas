@@ -34,7 +34,7 @@ def index():
 @login_required(role_id=1)
 def admin():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT user_id, username, first_name, last_name, run, password, role_id FROM users")
+    cur.execute("SELECT user_id, username, first_name, last_name, run, dv, password, position, role_id FROM users")
     usuarios = cur.fetchall()
     cur.close()
     user_data = session['user_data']
@@ -117,11 +117,13 @@ def add_user():
         first_name = request.form['first_name']
         last_name = request.form['last_name']
         run = request.form['run']
+        dv = request.form['dv']
         role_id = request.form['role_id']
+        position = request.form['position']
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (username, first_name, last_name, run, password, role_id) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (username, first_name, last_name, run, password, role_id))
+        cur.execute("INSERT INTO users (username, first_name, last_name, run, dv, password, position, role_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (username, first_name, last_name, run, dv, password, position, role_id))
         mysql.connection.commit()
         cur.close()
 
@@ -143,12 +145,15 @@ def edit_user(user_id):
         first_name = request.form['editFirstName']
         last_name = request.form['editLastName']
         run = request.form['editRun']
+        dv = request.form['editDv']
+        password = request.form['editPassword']
+        position = request.form['editPosition']
         id_role = request.form['editIdRole']
 
 
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE users SET username = %s, first_name = %s, last_name = %s, run = %s, role_id = %s WHERE user_id = %s",
-                    (username, first_name, last_name, run, id_role, user_id))
+        cur.execute("UPDATE users SET username = %s, first_name = %s, last_name = %s, run = %s, dv = %s, password = %s, position  = %s, role_id = %s WHERE user_id = %s",
+                    (username, first_name, last_name, run, dv, password, position, id_role, user_id))
        
 
         mysql.connection.commit()
