@@ -34,7 +34,7 @@ def index():
 @login_required(role_id=1)
 def admin():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT user_id, username, first_name, last_name, run, password, role_id FROM users")
+    cur.execute("SELECT user_id, username, first_name, last_name, run, dv, password, position, role_id FROM users")
     usuarios = cur.fetchall()
     cur.close()
     user_data = session['user_data']
