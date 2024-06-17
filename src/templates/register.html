@@ -9,7 +9,7 @@
 
 {% block body %} 
 <main>
-    <form class="form-signup"  action="/crear-registro" method="POST">
+    <form class="form-signup"  action="/add_user" method="POST">
         <img class="mb-4" src="{{ url_for('static',filename='img/nuevo-usuario.png') }}" alt="icon_user" width="72" height="72">
         <h1 class="h3 mb-3 fw-normal">Agregar Nuevo</h1>
         
@@ -46,9 +46,9 @@
         <div class="form-floating">
             <select class="form-select" id="id_rol" name="id_rol" aria-label="Default select example" required>
                 <option selected disabled>Rol</option>
-                <option value="1" id="id_rol" name="id_rol">Admin</option>
-                <option value="2" id="id_rol" name="id_rol">Editor</option>
-                <option value="3" id="id_rol" name="id_rol">Visor</option>
+                {% for rol in roles %}
+                <option value="{{ rol.role_id }}" id="id_rol" name="id_rol">{{ rol.name }}</option>
+                {% endfor %}
               </select>
         </div>
         <button class="w-100 btn-submit btn-lg btn-primary" type="submit">Agregar</button>
