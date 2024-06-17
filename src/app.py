@@ -110,25 +110,32 @@ def home():
 @app.route('/registro')
 def registro():
     if 'username' in session:
-        return render_template('register.html', first_name=session['first_name'])
+        cur = db.connection.cursor()
+        cur.execute(f'''SELECT * FROM roles''')
+        roles = cur.fetchall()
+        cur.close()
+        return render_template('register.html', first_name=session['first_name'], roles=roles)
     else:
         return redirect(url_for('login'))
 
+#MOSTRAR PRODUCTOS
 @app.route('/inventario')
 def show_prod():
     if 'username' in session:
         sort_by = request.args.get('sort_by')
         if sort_by:
             if sort_by == 'nombre':
-                order_by_clause = 'ORDER BY nombre'
+                order_by_clause = 'ORDER BY name_prod'
             elif sort_by == 'descripcion':
-                order_by_clause = 'ORDER BY descripcion'
-            elif sort_by == 'ubicacion':
-                order_by_clause = 'ORDER BY ubicacion'
-            elif sort_by == 'cantidad':
-                order_by_clause = 'ORDER BY cantidad'
+                order_by_clause = 'ORDER BY desc_prod'
+            elif sort_by == 'precio':
+                order_by_clause = 'ORDER BY price'
+            elif sort_by == 'proveedor':
+                order_by_clause = 'ORDER BY supplier'
             elif sort_by == 'categoria':
-                order_by_clause = 'ORDER BY categoria'
+                order_by_clause = 'ORDER BY category'
+            elif sort_by == 'stock':
+                order_by_clause = 'ORDER BY stock'
 
             # Realiza la consulta a la base de datos para obtener los productos ordenados
             cur = db.connection.cursor()
@@ -137,19 +144,32 @@ def show_prod():
                     LEFT JOIN categories c ON p.category = c.cat_id {order_by_clause}''')
             productos = cur.fetchall()
             cur.close()
-            return render_template('inventario.html', first_name=session['first_name'],productos=productos)
+            return render_template('inventario.html', first_name=session['first_name'],productos=productos, categorias=categorias)
 
         
         cur = db.connection.cursor()
-        cur.execute('''SELECT p.*, c.cat_name AS categoria_nombre
+        cur.execute('''SELECT p.*, c.cat_name as categ_name, c.cat_id as id_categ, s.supp_name as name_supplier, s.supp_id as id_supplier
         FROM products p
-        LEFT JOIN categories c ON p.category = c.cat_id''')
+        LEFT JOIN categories c ON p.category = c.cat_id
+        LEFT JOIN supplier s ON p.supplier = s.supp_id''')
         productos = cur.fetchall()
+
+        #Obtiene categorias
+        cur = db.connection.cursor()
+        cur.execute('''SELECT * FROM categories''')
+        categorias = cur.fetchall()
+
+        #Obtiene Proveedores
+        cur = db.connection.cursor()
+        cur.execute('''SELECT * FROM supplier''')
+        proveedor = cur.fetchall()
         cur.close()
-        return render_template('inventario.html', first_name=session['first_name'],productos=productos)
+        
+        return render_template('inventario.html', first_name=session['first_name'],productos=productos, categorias=categorias, proveedor=proveedor)
     else:
         return redirect(url_for('login'))
 
+#MOSTRAR MODIFICACIONES
 @app.route('/modifications')
 def show_modifications():
     if 'username' in session:
@@ -182,20 +202,16 @@ def show_modifications():
 @app.route('/supplier')
 def show_supplier():
     if 'username' in session:
-        '''sort_by = request.args.get('sort_by')
+        sort_by = request.args.get('sort_by')
         if sort_by:
-            if sort_by == 'first_name':
-                order_by = 'ORDER BY first_name'
-            elif sort_by == 'producto':
-                order_by = 'ORDER BY producto_nombre'
+            if sort_by == 'nombre':
+                order_by = 'ORDER BY supp_name'
+            elif sort_by == 'direccion':
+                order_by = 'ORDER BY address'
+            elif sort_by == 'transacciones':
+                order_by = 'ORDER BY transactions'
             elif sort_by == 'id':
-                order_by = 'ORDER BY id'
-            elif sort_by == 'nro_serie':
-                order_by = 'ORDER BY nro_serie'
-            elif sort_by == 'fecha':
-                order_by = 'ORDER BY fecha_hora DESC'
-        else:
-            order_by = 'ORDER BY fecha_hora DESC'''
+                order_by = 'ORDER BY supp_id'
         
         cur = db.connection.cursor()
         cur.execute(f'''SELECT * 
@@ -206,6 +222,27 @@ def show_supplier():
     else:
         return redirect(url_for('login'))
 
+@app.route('/edit_supplier')
+#@login_required(role_id=2) 
+def edit_supplier(id):
+
+            name = request.form['editName']
+            address = request.form['editAddress']
+            contact = request.form['editContact']
+            transactions = request.form['editTransaction']
+  
+            
+            #Actualizar proveedores
+            cur = db.connection.cursor()
+            cur.execute('UPDATE supplier SET supp_name = %s, address = %s, contact = %s, transactions = %s, WHERE supp_id = %s',
+                    (name, address, contact, transactions, id))
+            db.connection.commit()
+            cur.close()
+
+
+            flash('Proveedor Modificado!')
+            return redirect(url_for('show_supplier'))
+
 #Generar contraseña
 def generate_password():
     import string
@@ -215,16 +252,23 @@ def generate_password():
     password = ''.join(random.choice(characters) for i in range(8))  # Genera una contraseña de 8 caracteres
     return password
 
-#Mostrar usuarios
+#MOSTRAR USUARIOS
 @app.route('/users', methods=["GET", "POST"])
 def show_users():
 
     if 'username' in session:
+        
         cur = db.connection.cursor()
-        cur.execute('SELECT * FROM users')
+        cur.execute('''SELECT u.*, r.name as rol_name, r.role_id
+                    FROM users u
+                    LEFT JOIN roles r ON u.role_id = r.role_id''')
         usuarios = cur.fetchall()
+
+        cur = db.connection.cursor()
+        cur.execute('SELECT * FROM roles')
+        roles = cur.fetchall()
         cur.close()
-        return render_template('users.html', first_name=session['first_name'],usuarios=usuarios)
+        return render_template('users.html', first_name=session['first_name'],usuarios=usuarios, roles=roles)
     else:
         return redirect(url_for('login'))
 
@@ -270,7 +314,7 @@ def add_user():
         return render_template('register.html')
 
 #Agregar producto
-@app.route('/add_product')
+@app.route('/add_product', methods=['GET', 'POST'])
 #@login_required(role_id=2) 
 def add_product():
     if request.method == 'POST':
@@ -278,33 +322,38 @@ def add_product():
                 flash('Seleccione opcion en el campo "Categoria".', 'danger')
                 return redirect(url_for('show_prod'))
 
+            '''if 'addImg' not in request.files:
+                flash('Agrege una imagen')
+                return redirect(url_for('show_prod'))'''
+
             name = request.form['addName']
             desc = request.form['addDesc']
             price = request.form['addprice']
-            supplier = request.form['addSupplier']
+            #supplier = request.form['addSupplier']
             stock = request.form['addStock']
             category = request.form['addCategory']
-            img = request.form['addImg']
+            #img = request.files['addImg']
 
             # Verificar si se han dejado campos en blanco
-            if not name or not desc or not precio or not supplier or not stock:
+            if not name or not desc or not price or not stock:
                 flash('Por favor, completa todos los campos.', 'danger')
                 return redirect(url_for('show_prod'))
 
             
             cur = db.connection.cursor()
-            cur.execute('INSERT INTO products(name_prod, desc_prod, price, supplier, category, stock, img) VALUES(%s,%s,%s,%s,%s,%s,%s)',
-                        (name,desc,price,supplier,stock, category, img))
+            cur.execute('INSERT INTO products(name_prod, desc_prod, price,  category, stock) VALUES(%s,%s,%s,%s,%s)',
+                        (name,desc,price,stock, category))
             db.connection.commit()
             cur.close()
 
             flash('Producto agregado!')
             return redirect(url_for('show_prod'))
-        
+    
     return redirect(url_for('show_prod'))
 
+
 #Editar producto
-@app.route('/edit_product')
+@app.route('/edit_product/<int:id>', methods=['POST'])
 #@login_required(role_id=2) 
 def edit_product(id):
 
@@ -318,14 +367,14 @@ def edit_product(id):
   
             
             #Obtiene usuario actual
-            user_id = session['id']
+            user_id = session['user_id']
             first_name = session['first_name']
             last_name = session['last_name']
 
             #Actualizar productos
             cur = db.connection.cursor()
-            cur.execute('UPDATE products SET name_prod = %s, desc_prod = %s, price = %s, supplier = %s, category = %s,stock = %s, img = %s WHERE id = %s',
-                    (name, desc, price, supplier, category, stock, img, id))
+            cur.execute('UPDATE products SET name_prod = %s, desc_prod = %s, price = %s, supplier = %s, category = %s,stock = %s WHERE prod_id = %s',
+                    (name, desc, price, supplier, category, stock, id))
             db.connection.commit()
             cur.close()
 
@@ -390,9 +439,9 @@ def edit_user(user_id):
 @app.route('/delete_user/<int:user_id>', methods=["POST"])
 #@login_required(role_id=1)  
 def delete_user(user_id):
-    cur = mysql.connection.cursor()
+    cur = db.connection.cursor()
     cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
-    mysql.connection.commit()
+    db.connection.commit()
     cur.close()
     return redirect('/users')
 
