@@ -45,15 +45,7 @@
                     <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
                     <td>{{ usuario.run }}</td>
                     <td>{{ usuario.password }}</td>
-                    <td>
-                        {% if usuario.role_id == 1 %}
-                        Admin
-                        {% elif usuario.role_id == 2 %}
-                        Editor
-                        {% elif usuario.role_id == 3 %}
-                        Visor
-                        {% endif %}
-                    </td>
+                    <td>{{ usuario.rol_name }}</td>
                     <td>
                         <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                             data-bs-target="#editUser{{ usuario.user_id }}">
@@ -104,12 +96,11 @@
                                             <div class="mb-3">
                                                 <label for="editIdRol{{ usuario.user_id }}" class="form-label">Rol</label>
                                                 <select class="form-control" id="editIdRol{{ usuario.user_id }}" name="editIdRol">
-                                                    <option value="1" {% if usuario.role_id==1 %} selected {% endif
-                                                        %}>Admin</option>
-                                                    <option value="2" {% if usuario.role_id==2 %} selected {% endif
-                                                        %}>Editor</option>
-                                                    <option value="3" {% if usuario.role_id==3 %} selected {% endif
-                                                        %}>Visor</option>
+                                                    {% for rol in roles %}
+                                                    <option value="{{ rol.role_id }}" {% if usuario.role_id==rol.role_id %} selected {% endif%}>
+                                                        {{ rol.name }}
+                                                    </option>
+                                                    {% endfor %}
                                                 </select>
                                             </div>
                                             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
