@@ -25,9 +25,10 @@
             <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownProduct1">
                 <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='nombre') }}">Nombre</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='descripcion') }}">Descripción</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='ubicacion') }}">Ubicación</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='cantidad') }}">Cantidad</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='precio') }}">Precio</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='proveedor') }}">Proveedor</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='categoria') }}">Categoría</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_prod', sort_by='stock') }}">Stock</a></li>
             </ul>
         </div>
     </header>                
@@ -81,9 +82,9 @@
                         <td>{{ data.name_prod }}</td>
                         <td>{{ data.desc_prod }}</td>
                         <td>{{ data.price }}</td>
-                        <td>{{ data.supplier }}</td>
+                        <td>{{ data.name_supplier }}</td>
                         <td>{{ data.stock }}</td>
-                        <td>{{ data.categoria_nombre }}</td>
+                        <td>{{ data.categ_name }}</td>
                         {% if g.user and g.user['role_id'] == 2 or g.user and g.user['role_id'] == 1 %}
                         <td>
                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
@@ -91,7 +92,7 @@
                                 <i class="bi bi-pencil-fill"></i>
                             </button>
                             <!-- MODAL EDICION/MODIFICACION PRODUCTOS-->
-                            <div class="modal fade" id="editProduct{{ data.id }}" tabindex="-1"
+                            <div class="modal fade" id="editProduct{{ data.prod_id }}" tabindex="-1"
                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -105,7 +106,7 @@
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="editName{{ data.prod_id }}" class="form-label">Nombre:</label>
-                                                        <input type="number" class="form-control" id="editName{{ data.prod_id }}" name="editName"
+                                                        <input type="text" class="form-control" id="editName{{ data.prod_id }}" name="editName"
                                                         value="{{ data.name_prod }}"required>
                                                     </div>
                                                     <div class="col-md-6">
@@ -115,53 +116,48 @@
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-12">
                                                         <label for="editImg{{ data.prod_id }}" class="form-label">Imagen:</label>
-                                                        <input type="text" class="form-control" id="editImg{{ data.prod_id }}" name="editImg"
+                                                        <input type="file" class="form-control" id="editImg{{ data.prod_id }}" name="editImg"
                                                         value="{{ data.img }}" required>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label for="editPrice{{ data.prod_id }}" class="form-label">Precio:</label>
-                                                        <input type="text" class="form-control" id="editPrice{{ data.prod_id }}" name="editPrice"
-                                                        value="{{ data.descripcion }}" required>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
-                                                        <label for="editSupplier{{ data.prod_id }}" class="form-label">Proveedor:</label>
+                                                        <label for="editPrice{{ data.prod_id }}" class="form-label">Precio:</label>
+                                                        <input type="text" class="form-control" id="editPrice{{ data.prod_id }}" name="editPrice"
+                                                        value="{{ data.price }}" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <!--label for="editSupplier{{ data.prod_id }}" class="form-label">Proveedor:</label>
                                                         <input type="int" class="form-control" id="editSupplier{{ data.prod_id }}" name="editSupplier"
-                                                        value="{{ data.precio }}" required>
+                                                        value="{{ data.name_supplier }}" required-->
+                                                        <label for="editSupplier{{ data.prod_id }}" class="form-label">Proveedor:</label>
+                                                        <select class="form-control" id="editSupplier{{ data.prod_id }}" name="editSupplier" required>
+                                                            {% for prov in proveedor %}
+                                                            <option value="{{ prov.supp_id }}" {% if data.supplier==prov.supp_id %} selected {% endif%}>
+                                                                {{ prov.supp_name }}
+                                                            </option>
+                                                            {% endfor %}
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="editStock{{ data.prod_id }}" class="form-label">Stock disponible:</label>
                                                         <input type="number" class="form-control" id="editStock{{ data.prod_id }}" name="editStock"
-                                                        value="{{ data.cantidad }}"required>
+                                                        value="{{ data.stock }}"required>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="editCategory{{ data.prod_id }}" class="form-label">Categoría:</label>
                                                         <select class="form-control" id="editCategory{{ data.prod_id }}" name="editCategory" required>
-                                                            <option value="1" {% if data.categoria==1 %} selected {% endif
-                                                                %}>Herramienta Manual</option>
-                                                            <option value="2" {% if data.categoria==2 %} selected {% endif
-                                                                %}>Herramienta Eléctrica</option>
-                                                            <option value="3" {% if data.categoria==3 %} selected {% endif
-                                                                %}>Jardinería</option>
-                                                            <option value="4" {% if data.categoria==4 %} selected {% endif
-                                                                %}>Construcción</option>
-                                                            <option value="5" {% if data.categoria==5 %} selected {% endif
-                                                                %}>Fijación</option>
-                                                            <option value="6" {% if data.categoria==6 %} selected {% endif
-                                                                %}>Suministros Eléctricos</option>
-                                                            <option value="7" {% if data.categoria==7 %} selected {% endif
-                                                                %}>Pintura y Acabado</option>
-                                                            <option value="8" {% if data.categoria==8 %} selected {% endif
-                                                                %}>Fontanería/option>
-                                                            <option value="9" {% if data.categoria==9 %} selected {% endif
-                                                                %}>Decoración</option>
+                                                            {% for categ in categorias %}
+                                                            <option value="{{ categ.cat_id }}" {% if data.category==categ.cat_id %} selected {% endif %}>
+                                                                {{ categ.cat_name }}
+                                                            </option>
+                                                            {% endfor %}
                                                         </select>
                                                     </div>
                                                 </div>         
@@ -186,7 +182,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p>No hay productos</p>
+            <p>No hay productos registrados</p>
             {% endif %}
         </div>
     </div>
@@ -203,27 +199,32 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addName" class="form-label">Nombre:</label>
-                                <input type="number" class="form-control" id="addName" name="addName" required>
+                                <input type="text" class="form-control" id="addName" name="addName" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="addDesc" class="form-label">Descripción:</label>
                                 <input type="text" class="form-control" id="addDesc" name="addDesc" required>
                             </div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="addImg" class="form-label">Imagen:</label>
-                                <input type="text" class="form-control" id="addImg" name="addImg" required>
+                        <!--div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="addImg" class="form-label">Selecciona Imagen del producto:</label>
+                                <input type="file" class="form-control" id="addImg" name="addImg" accept=".jpg .png .jpeg" >
                             </div>
+                        </div-->
+                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addprice" class="form-label">Precio:</label>
                                 <input type="number" class="form-control" id="addprice" name="addprice" required>
                             </div>
-                        </div>
-                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addSupplier" class="form-label">Proveedor:</label>
-                                <input type="text" class="form-control" id="addSupplier" name="addSupplier" required>
+                                <select class="form-control" id="addSupplier" name="addSupplier" required>
+                                    <option selected disabled>Seleccione</option>
+                                    {% for prov in proveedor %}
+                                    <option value="{{ prov.supp_id }}" id="proveedor" name="proveedor">{{ prov.supp_name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -231,21 +232,13 @@
                                 <label for="addStock" class="form-label">Stock:</label>
                                 <input type="number" class="form-control" id="addStock" name="addStock" required>
                             </div>
-                        </div>
-                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addCategory" class="form-label">Categoría:</label>
                                 <select class="form-control" id="addCategory" name="addCategory" required>
                                     <option selected disabled>Seleccione</option>
-                                    <option value="1" id="categoria" name="categoria">Herramienta Manual</option>
-                                    <option value="2" id="categoria" name="categoria">Herramienta Eléctrica</option>
-                                    <option value="3" id="categoria" name="categoria">Jardinería</option>
-                                    <option value="4" id="categoria" name="categoria">Construcción</option>
-                                    <option value="5" id="categoria" name="categoria">Fijación</option>
-                                    <option value="6" id="categoria" name="categoria">Suministros Eléctricos</option>
-                                    <option value="7" id="categoria" name="categoria">Pintura y Acabado</option>
-                                    <option value="8" id="categoria" name="categoria">Fontanería</option>
-                                    <option value="9" id="categoria" name="categoria">Decoración</option>
+                                    {% for categ in categorias %}
+                                    <option value="{{ categ.cat_id }}" id="categoria" name="categoria">{{ categ.cat_name }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>            
