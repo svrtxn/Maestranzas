@@ -7,7 +7,7 @@ class DevelopmentConfig(Config):
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = ''
-    MYSQL_DB = 'ej_maestranzas'
+    MYSQL_DB = 'maestranzas'
     MYSQL_CURSORCLASS = 'DictCursor'
 
 config = {
