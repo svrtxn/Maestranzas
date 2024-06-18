@@ -101,6 +101,7 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
+                                        
                                         <div class="modal-body">
                                             <form action="/edit_product/{{ data.prod_id }}" method="POST">
                                                 <div class="row mb-3">
@@ -115,13 +116,13 @@
                                                         value="{{ data.name_prod }}" required>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <!--div class="row mb-3">
                                                     <div class="col-md-12">
                                                         <label for="editImg{{ data.prod_id }}" class="form-label">Imagen:</label>
                                                         <input type="file" class="form-control" id="editImg{{ data.prod_id }}" name="editImg"
                                                         value="{{ data.img }}" required>
                                                     </div>
-                                                </div>
+                                                </div-->
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="editPrice{{ data.prod_id }}" class="form-label">Precio:</label>
@@ -221,9 +222,13 @@
                                 <label for="addSupplier" class="form-label">Proveedor:</label>
                                 <select class="form-control" id="addSupplier" name="addSupplier" required>
                                     <option selected disabled>Seleccione</option>
-                                    {% for prov in proveedor %}
-                                    <option value="{{ prov.supp_id }}" id="proveedor" name="proveedor">{{ prov.supp_name }}</option>
-                                    {% endfor %}
+                                    {% if proveedor %}
+                                        {% for prov in proveedor %}
+                                        <option value="{{ prov.supp_id }}" id="proveedor" name="proveedor">{{ prov.supp_name }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="x" id="proveedor" name="proveedor" disabled>No hay proveedores</option>
+                                    {% endif %}
                                 </select>
                             </div>
                         </div>

@@ -61,6 +61,8 @@
                     <th>Dirección</th>
                     <th>Contacto</th>
                     <th>Transacciones</th>
+                    <th>Inicio Contrato</th>
+                    <th>Termino Contrato</th>
                     {% if g.user and g.user['role_id'] == 2 or g.user and g.user['role_id'] == 1  %}
                     <th>Modificar</th>
                     {% endif %}
@@ -74,6 +76,8 @@
                     <td>{{ p.address }}</td>
                     <td>{{ p.contact }}</td>
                     <td>{{ p.transactions }}</td>
+                    <td>{{ p.start_cont }}</td>
+                    <td>{{ p.renew_cont }}</td>
                     {% if g.user and g.user['role_id'] == 2 or g.user and g.user['role_id'] == 1 %}
                     <td>
                         <button type="button" class="btn btn-warning" data-bs-toggle="modal"
@@ -145,15 +149,15 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/agregar_proveedor" method="POST">
+                    <form action="/add_supplier" method="POST">
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addName" class="form-label">Nombre Empresa:</label>
                                 <input type="text" class="form-control" id="addName" name="addName" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="addDesc" class="form-label">Dirección:</label>
-                                <input type="text" class="form-control" id="addDesc" name="addDesc" required>
+                                <label for="addAddress" class="form-label">Dirección:</label>
+                                <input type="text" class="form-control" id="addAddress" name="addAddress" required>
                             </div>
                         </div>
                         <div class="row mb-3">

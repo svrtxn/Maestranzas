@@ -43,7 +43,7 @@
                     <td>{{ usuario.user_id }}</td>
                     <td>{{ usuario.username }}</td>
                     <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
-                    <td>{{ usuario.run }}</td>
+                    <td>{{ usuario.run }} - {{ usuario.dvrun }}</td>
                     <td>{{ usuario.password }}</td>
                     <td>{{ usuario.rol_name }}</td>
                     <td>
@@ -69,21 +69,31 @@
                                                 <input type="text" class="form-control" id="editUsername{{ usuario.user_id }}"
                                                     name="editUsername" value="{{ usuario.username }}">
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editName{{ usuario.id }}" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="editName{{ usuario.user_id }}"
-                                                    name="editName" value="{{ usuario.first_name }}">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="editName{{ usuario.id }}" class="form-label">Nombre</label>
+                                                    <input type="text" class="form-control" id="editName{{ usuario.user_id }}"
+                                                        name="editName" value="{{ usuario.first_name }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="editLastName{{ usuario.user_id }}" class="form-label">Apellido</label>
+                                                    <input type="text" class="form-control" id="editLastName{{ usuario.user_id }}"
+                                                        name="editLastName" value="{{ usuario.last_name }}"> 
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editLastName{{ usuario.user_id }}" class="form-label">Apellido</label>
-                                                <input type="text" class="form-control" id="editLastName{{ usuario.user_id }}"
-                                                    name="editLastName" value="{{ usuario.last_name }}"> 
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editRut{{ usuario.run }}" class="form-label">Rut</label>
-                                                <input type="text" class="form-control" id="editRut{{ usuario.user_id }}"
-                                                    name="editRut" value="{{ usuario.run }}" pattern="\d{8,9}">
-                                                    <small class="help-text">Sin puntos Ni guión (Formato esperado: 123456789)</small>
+                                            <div class="row mb-3">
+                                                <div class="col-md-7">
+                                                    <label for="editRut{{ usuario.user_id }}" class="form-label">Rut</label>
+                                                    <input type="int" class="form-control" id="editRut{{ usuario.user_id }}"
+                                                    name="editRut" value="{{ usuario.run }}" pattern="\d{7,8}">
+                                                </div>
+                                                
+                                                <div class="col-md-2 ">
+                                                    <label for="editDvRut{{ usuario.user_id }}" class="form-label">Dv</label>
+                                                    <input type="text" class="form-control" id="editDvRut{{ usuario.user_id }}"
+                                                    name="editDvRut" value="{{ usuario.dvrun }}" pattern=".{1,1}" required>
+                                                </div>
+                                                <small class="help-text">Sin puntos (Formato esperado: 00000000  -  0)</small>
                                             </div>
                                             <div class="mb-3">
                                                 <div class="form-check">
