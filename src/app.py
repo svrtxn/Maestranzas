@@ -1,7 +1,9 @@
 from flask import Flask
 from flask import render_template, redirect, url_for,request, Response, session, flash, g
 from flask_mysqldb import MySQL, MySQLdb
+from datetime import datetime
 from config import config
+from dateutil.relativedelta import relativedelta
 from functools import wraps
 
 
@@ -222,7 +224,7 @@ def show_supplier():
     else:
         return redirect(url_for('login'))
 
-@app.route('/edit_supplier')
+@app.route('/edit_supplier/<int:id>', methods=['POST'])
 #@login_required(role_id=2) 
 def edit_supplier(id):
 
@@ -232,9 +234,9 @@ def edit_supplier(id):
             transactions = request.form['editTransaction']
   
             
-            #Actualizar proveedores
+            #Actualiza proveedores
             cur = db.connection.cursor()
-            cur.execute('UPDATE supplier SET supp_name = %s, address = %s, contact = %s, transactions = %s, WHERE supp_id = %s',
+            cur.execute('UPDATE supplier SET supp_name = %s, address = %s, contact = %s, transactions = %s WHERE supp_id = %s',
                     (name, address, contact, transactions, id))
             db.connection.commit()
             cur.close()
@@ -243,13 +245,40 @@ def edit_supplier(id):
             flash('Proveedor Modificado!')
             return redirect(url_for('show_supplier'))
 
+@app.route('/add_supplier', methods=["POST"])
+#@login_required(role_id=2) 
+def add_supplier():
+
+            name = request.form['addName']
+            address = request.form['addAddress']
+            contact = request.form['addContact']
+            transactions = request.form['addTransaction']
+            #Obtiene fecha actual
+            start_contract = datetime.now().date()
+
+            #Agrega 6 meses a partir de start_contract
+            renew_contract = start_contract + relativedelta(months=6)
+            
+            #Actualiza proveedores
+            cur = db.connection.cursor()
+            cur.execute('INSERT INTO supplier(supp_name, start_cont, renew_cont, address, contact, transactions) VALUES(%s,%s,%s,%s,%s,%s)',
+                    (name,start_contract, renew_contract, address, contact, transactions))
+            db.connection.commit()
+            cur.close()
+
+
+            flash('Proveedor Agregado!')
+            return redirect(url_for('show_supplier'))
+
 #Generar contraseña
-def generate_password():
+def generate_password(min_length=8, max_length=12):
     import string
     import random
 
     characters = string.ascii_letters + string.digits
-    password = ''.join(random.choice(characters) for i in range(8))  # Genera una contraseña de 8 caracteres
+    length = random.randint(min_length,max_length)
+    #Genera una contraseña de entre 8 y 12 caracteres
+    password = ''.join(random.choice(characters) for i in range(length))  
     return password
 
 #MOSTRAR USUARIOS
@@ -287,16 +316,12 @@ def add_user():
             first_name = request.form['first_name']
             last_name = request.form['last_name']
             run = request.form['run']
+            dvrun = request.form['dvrun']
 
             # Verificar si se han dejado campos en blanco
-            if not first_name or not last_name or not run:
+            if not first_name or not last_name or not run or not dvrun:
                 flash('Por favor, completa todos los campos.', 'danger')
                 return render_template('register.html')
-            try:
-                rut = format_rut(run)
-            except ValueError as e:
-                flash(str(e))
-                return redirect(url_for('registro'))
         
             password = generate_password()
 
@@ -304,14 +329,14 @@ def add_user():
             username = f"{first_name[:3].lower()}.{last_name.lower()}"
             
             cur = db.connection.cursor()
-            cur.execute('INSERT INTO users(role_id, username, password, first_name, last_name, run) VALUES(%s,%s,%s,%s,%s,%s)',
-                        (role_id,username,password,first_name, last_name, rut))
+            cur.execute('INSERT INTO users(role_id, username, password, first_name, last_name, run, dvrun) VALUES(%s,%s,%s,%s,%s,%s,%s)',
+                        (role_id,username,password,first_name, last_name, run,dvrun))
             db.connection.commit()
             cur.close()
 
             flash('Usuario creado!', 'success')
-            return render_template('register.html')
-        return render_template('register.html')
+            return redirect(url_for('registro'))
+        return redirect(url_for('registro'))
 
 #Agregar producto
 @app.route('/add_product', methods=['GET', 'POST'])
@@ -329,7 +354,7 @@ def add_product():
             name = request.form['addName']
             desc = request.form['addDesc']
             price = request.form['addprice']
-            #supplier = request.form['addSupplier']
+            supplier = request.form['addSupplier']
             stock = request.form['addStock']
             category = request.form['addCategory']
             #img = request.files['addImg']
@@ -339,10 +364,13 @@ def add_product():
                 flash('Por favor, completa todos los campos.', 'danger')
                 return redirect(url_for('show_prod'))
 
+            # Verificar si el supplier_id existe en la tabla supplier
+            cur = db.connection.cursor()
+            cur.execute("SELECT supp_id FROM supplier WHERE supp_id = %s", (supplier,))
             
             cur = db.connection.cursor()
-            cur.execute('INSERT INTO products(name_prod, desc_prod, price,  category, stock) VALUES(%s,%s,%s,%s,%s)',
-                        (name,desc,price,stock, category))
+            cur.execute('INSERT INTO products(name_prod, desc_prod, price, supplier, category, stock) VALUES(%s,%s,%s,%s,%s,%s)',
+                        (name,desc,price, supplier, category,stock))
             db.connection.commit()
             cur.close()
 
@@ -363,7 +391,7 @@ def edit_product(id):
             supplier = request.form['editSupplier']
             category = request.form['editCategory']
             stock = request.form['editStock']
-            img = request.form['editImg']
+            #img = request.form['editImg']
   
             
             #Obtiene usuario actual
@@ -388,18 +416,6 @@ def edit_product(id):
             flash('Producto Modificado!')
             return redirect(url_for('show_prod'))
 
-#Formato del rut
-def format_rut(run):
-    rut_str = str(run)
-
-    # Valida que el RUT tenga entre 8 y 9 caracteres numéricos
-    if not rut_str.isdigit() or not (8 <= len(rut_str) <= 9):
-        raise ValueError("El RUT debe ser numérico y tener entre 8 y 9 dígitos")
-
-    # Formatear RUT
-    formatted_rut = f"{rut_str[:-7]}.{rut_str[-7:-4]}.{rut_str[-4:-1]}-{rut_str[-1]}"
-    return formatted_rut
-
 # EDITAR USUARIOS POR PARTE DEL ADMIN
 @app.route('/edit_user/<int:user_id>', methods=["POST"])
 #@login_required(role_id=1)  
@@ -410,24 +426,19 @@ def edit_user(user_id):
         first_name = request.form['editName']
         last_name = request.form['editLastName']
         run = request.form['editRut']
-
-        try:
-            rut = format_rut(run)
-        except ValueError as e:
-            flash(str(e))
-            return redirect(url_for('show_users'))
+        dvrun = request.form['editDvRut']
 
         #Generar nueva contraseña
         generate_password_flag = request.form.get('generatePassword')
         if generate_password_flag:
             password = generate_password()
             cur = db.connection.cursor()
-            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s, password = %s WHERE user_id = %s',
-                    (id_rol, username, first_name, last_name, run, password, user_id))
+            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s, dvrun = %s, password = %s WHERE user_id = %s',
+                    (id_rol, username, first_name, last_name, run, dvrun, password, user_id))
         else:
             cur = db.connection.cursor()
-            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s WHERE user_id = %s',
-                (id_rol, username, first_name, last_name, rut, user_id))
+            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s, dvrun = %s WHERE user_id = %s',
+                (id_rol, username, first_name, last_name, run, dvrun, user_id))
             
         db.connection.commit()
         cur.close()
