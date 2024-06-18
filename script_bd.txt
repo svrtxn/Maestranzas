@@ -8,7 +8,7 @@ CREATE DATABASE IF NOT EXISTS `maestranzas`;
 USE maestranzas;
 
 CREATE TABLE IF NOT EXISTS `roles` (
-  `role_id` int(30) NOT NULL,
+  `role_id` int(30) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -19,9 +19,9 @@ INSERT INTO `roles` (`role_id`, `name`) VALUES
 (3, 'visor');
 
 CREATE TABLE IF NOT EXISTS `supplier` (
-  `supp_id` int(30) NOT NULL,
+  `supp_id` int(30) NOT NULL AUTO_INCREMENT,
   `supp_name` varchar(255) NOT NULL,
-  `start_cont` varchar(255) NOT NULL,
+  `start_cont` date NOT NULL,
   `renew_cont` varchar(255) NOT NULL,
   `address` varchar(255) NOT NULL,
   `contact` varchar(255) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `supplier` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `categories` (
-  `cat_id` int(30) NOT NULL,
+  `cat_id` int(30) NOT NULL AUTO_INCREMENT,
   `cat_name` varchar(255) NOT NULL,
   PRIMARY KEY (`cat_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -58,7 +58,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` varchar(255) NOT NULL,
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
-  `run` varchar(12) NOT NULL,
+  `run` int(10) NOT NULL,
+  `dvrun` varchar(1) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`),
@@ -70,10 +71,10 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- EJECUTAR ESTA SECCIÓN TERCERO
 -------------------------------------------------------------------------------------------------------- 
 
-INSERT INTO `users` (`user_id`,`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
-('','admin', 'admin', 'admin', '111111111', 'admin', 1),
-('','editor', 'editor', 'editor', '222222222', 'editor', 2),
-('','visor', 'visor', 'visor', '3333333333', 'visor', 3);
+INSERT INTO `users` (`user_id`,`username`, `first_name`, `last_name`, `run`, `dvrun`, `password`, `role_id`) VALUES
+('','admin', 'admin', 'admin', '11111111', '1', 'admin', 1),
+('','editor', 'editor', 'editor', '22222222', '2', 'editor', 2),
+('','visor', 'visor', 'visor', '33333333', '3', 'visor', 3);
 
 --------------------------------------------------------------------------------------------------------
 -- EJECUTAR ESTA SECCIÓN CUARTO
