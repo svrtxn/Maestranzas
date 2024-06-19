@@ -12,8 +12,8 @@
         <h2 class="pb-3 pt-2">MODIFICACIONES</h2>
         
         <div class="search">
-            <form action="/buscar-modificacion" method="POST" class="d-flex mb-2 search" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
+            <form class="d-flex mb-2 search" role="search">
+                <input class="form-control me-2" id="search-mod" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
             </form>
         </div>
                     
@@ -23,7 +23,6 @@
             </a>
             <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownProduct2">
                 <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='id') }}">ID</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='id_prod') }}">ID Producto</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='producto') }}">Producto</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='first_name') }}">Responsable</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='fecha') }}">Fecha y Hora</a></li>
@@ -59,4 +58,6 @@
         {% endif %}
     </div>
 </main>
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+
 {% endblock %}

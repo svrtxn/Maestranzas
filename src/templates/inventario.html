@@ -13,8 +13,8 @@
         <h2 class="pb-3 pt-2">INVENTARIO</h2>
 
         <div class="search">
-            <form action="/buscar-producto" method="POST" class="mb-2 search" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar producto" aria-label="Search" name="search_query">
+            <form class="mb-2 search" role="search">
+                <input class="form-control me-2" id="search-prod" type="search" placeholder="Buscar producto" aria-label="Search" name="search_query">
             </form>
         </div>
                 
@@ -56,7 +56,7 @@
                 {% endwith %}
             {% endif %}
             
-            <table class="table">
+            <table class="table" id="product-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -255,6 +255,6 @@
         </div>
     
 </main>
-<script src="{{ url_for('static', filename='js/inventario.js') }}"></script>
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
 
 {% endblock %}

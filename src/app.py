@@ -183,8 +183,6 @@ def show_modifications():
                 order_by = 'ORDER BY producto_nombre'
             elif sort_by == 'id':
                 order_by = 'ORDER BY id'
-            elif sort_by == 'id_prod':
-                order_by = 'ORDER BY id_producto'
             elif sort_by == 'fecha':
                 order_by = 'ORDER BY time_date DESC'
         else:
@@ -214,10 +212,14 @@ def show_supplier():
                 order_by = 'ORDER BY transactions'
             elif sort_by == 'id':
                 order_by = 'ORDER BY supp_id'
+            elif sort_by == 'i-contrato':
+                order_by = 'ORDER BY start_cont DESC'
+        else:
+            order_by = 'ORDER BY supp_id'
         
         cur = db.connection.cursor()
         cur.execute(f'''SELECT * 
-                    FROM supplier''')
+                    FROM supplier {order_by}''')
         proveedores = cur.fetchall()
         cur.close()
         return render_template('supplier.html', first_name=session['first_name'],proveedores=proveedores)

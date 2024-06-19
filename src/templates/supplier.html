@@ -13,8 +13,8 @@
         <h2 class="pb-3 pt-2">PROVEEDORES</h2>
         
         <div class="search">
-            <form action="/buscar-modificacion" method="POST" class="d-flex mb-2 search" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
+            <form class="d-flex mb-2 search" role="search">
+                <input class="form-control me-2" id="search-sup" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
             </form>
         </div>
                     
@@ -27,6 +27,7 @@
                 <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='nombre') }}">Proveedor</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='direccion') }}">Dirección</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='transacciones') }}">Transacciones</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='i-contrato') }}">Fecha contrato</a></li>
             </ul>
         </div>
     </header>
@@ -53,11 +54,11 @@
                 {% endif %}
             {% endwith %}
         {% endif %}   
-        <table class="table" id="proveedor-table">
+        <table class="table" id="supplier-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Empresa</th>
+                    <th>Proveedor</th>
                     <th>Dirección</th>
                     <th>Contacto</th>
                     <th>Transacciones</th>
@@ -112,7 +113,7 @@
                                         <div class="col-md-6">
                                             <label for="editContact{{ p.supp_id}}" class="form-label">Contacto:</label>
                                             <input type="text" class="form-control" id="editContact{{ p.supp_id }}" name="editContact"
-                                            value="{{ p.contact }}" required>
+                                            value="{{ p.contact }}" pattern="\d{9}" required>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -163,7 +164,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="addContact" class="form-label">Contacto:</label>
-                                <input type="text" class="form-control" id="addContact" name="addContact" required>
+                                <input type="text" class="form-control" id="addContact" name="addContact" pattern="\d{9}" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="addTransaction" class="form-label">Transacciones:</label>
@@ -177,4 +178,6 @@
             </div>
         </div>
 </main>
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+
 {% endblock %}
