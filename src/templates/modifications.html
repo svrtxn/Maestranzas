@@ -1,0 +1,62 @@
+{% extends 'layouts/base-user.html' %}
+
+{% block title %}Modificaciones{% endblock %}
+
+{% block customCSS %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <header>            
+        <h2 class="pb-3 pt-2">MODIFICACIONES</h2>
+        
+        <div class="search">
+            <form action="/buscar-modificacion" method="POST" class="d-flex mb-2 search" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
+            </form>
+        </div>
+                    
+        <div class="dropdown-product ">
+            <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownProduct2" data-bs-toggle="dropdown" aria-expanded="false"> 
+                <strong>Ordenar por:</strong>
+            </a>
+            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownProduct2">
+                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='id') }}">ID</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='id_prod') }}">ID Producto</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='producto') }}">Producto</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='first_name') }}">Responsable</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_modifications', sort_by='fecha') }}">Fecha y Hora</a></li>
+            </ul>
+        </div>
+    </header>
+                                
+    <div class="table-responsive mt-4">
+
+        {% if modificaciones %}
+        <table class="table" id="modification-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Responsable</th>
+                    <th>Fecha y Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mod in modificaciones %}
+                <tr>
+                    <td>{{ mod.id }}</td>
+                    <td>{{ mod.producto_nombre }}</td>
+                    <td>{{ mod.first_name }} {{ mod.last_name }}</td>
+                    <td>{{ mod.time_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay modificaciones registradas.</p>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

@@ -1,5 +1,6 @@
 body {
     margin-top: 5rem;
+    background-color: #EEEEEe;
 }
 
 .logo {
@@ -9,9 +10,15 @@ body {
     margin-bottom: 2rem;
 }
 
-.logo i {
-    font-size: 2rem;
+.logo img {
+    width: 100px;
+    height: 100px;
 }
+
+.encabezado {
+    font-size: 30px;
+}
+
 
 .container {
     display: flex;
@@ -21,8 +28,7 @@ body {
 }
 
 .form-control {
-    /* From https://css.glass */
-    background: rgba(255, 255, 255, 0.29);
+    background-color: #f8f9fa;
     border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(5px);
@@ -35,4 +41,10 @@ body {
     margin-top: 1rem;
     width: 100%;
     margin-bottom: 1rem;
+}
+
+#togglePassword {
+    background-color: #cbcbcb;
+    border: 0px;
+    color: black;
 }

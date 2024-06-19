@@ -1,0 +1,41 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+.help-text {
+  display: block;
+  margin-left: 10px;
+  text-align: left !important;
+  font-size: 0.9em;
+  color: #b80b0b;
+}
+
+.row {
+  min-width: 90%;
+}
+
+.btn-submit {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#inputRun,
+#inputDv {
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: 10px;
+}
+
+#inputRun {
+  width: calc(100% - 100px);
+}
+
+#inputDv {
+  width: 50px;
+}

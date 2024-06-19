@@ -1,0 +1,72 @@
+{% extends 'layouts/base-user.html' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block customCSS %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <header>
+        <h2 class="pb-3 pt-2">AGREGAR USUARIO</h2>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <br>
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form action="/add_user" method="POST">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="inputNombre">Nombre:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese nombre" name="first_name"
+                    id="inputNombre">
+            </div>
+            <div class="col-md-4">
+                <label for="inputApellido">Apellido:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese apellido" name="last_name"
+                    id="inputApellido">
+            </div>
+            <div class="col-md-4">
+                <label for="inputRUN">RUN:</label>
+                <div class="d-flex">
+                    <input type="text" class="form-control mb-3" placeholder="Ingrese run" name="run" id="inputRun"
+                        maxlength="9">
+                    <p class="px-1">-</p>
+                    <input type="text" class="form-control mb-3" name="dv" id="inputDv" maxlength="1">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="inputPosition">Cargo:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese cargo" name="position"
+                    id="inputPosition">
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="inputRole">Rol:</label>
+                    <select class="form-control" id="inputRole" name="role_id">
+                        <option value="1">Admin</option>
+                        <option value="2">Editor</option>
+                        <option value="3">Visor</option>
+                        <option value="4">Recursos</option>
+                        <option value="5">Comprador</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary text-right">Agregar Usuario</button>
+    </form>
+</main>
+{% endblock %}
