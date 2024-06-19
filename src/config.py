@@ -6,8 +6,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     MYSQL_HOST = 'localhost'
     MYSQL_USER = 'root'
-    MYSQL_PASSWORD = ''
-    MYSQL_DB = 'ej_maestranzas'
+    MYSQL_PASSWORD = '123456'
+    MYSQL_DB = 'maestranzas'
     MYSQL_CURSORCLASS = 'DictCursor'
 
 config = {

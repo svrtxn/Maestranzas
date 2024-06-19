@@ -2,56 +2,71 @@
 
 {% block title %}Registro{% endblock %}
 
-{% block customCSS %} 
+{% block customCSS %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/registro.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
 {% endblock %}
 
-{% block body %} 
+{% block body %}
 <main>
-    <form class="form-signup"  action="/crear-registro" method="POST">
-        <img class="mb-4" src="{{ url_for('static',filename='img/nuevo-usuario.png') }}" alt="icon_user" width="72" height="72">
-        <h1 class="h3 mb-3 fw-normal">Agregar Nuevo</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            
-                {% if messages %}
-                <br>
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dissmissible" role="alert">
-                            <strong>{{ message }}</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-    
-            {% endwith %}
-    
-        <div class="form-floating">
-            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="first_name" >
-            <label for="first_name">Nombre</label>
-        </div>
-    
-        <div class="form-floating">
-            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="last_name" >
-            <label for="last_name">Apellido</label>
-        </div>
+    <header>
+        <h2 class="pb-3 pt-2">AGREGAR USUARIO</h2>
+    </header>
 
-        <div class="form-floating align-items-center">
-            <small class="help-text">Sin puntos Ni guión (Formato esperado: 123456789)</small>
-            <input type="text" class="form-control" id="run" name="run" placeholder="run"  pattern="\d{8,9}">
-            <label for="run" class="my-3">Rut</label>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <br>
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form action="/add_user" method="POST">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="inputNombre">Nombre:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese nombre" name="first_name"
+                    id="inputNombre">
+            </div>
+            <div class="col-md-4">
+                <label for="inputApellido">Apellido:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese apellido" name="last_name"
+                    id="inputApellido">
+            </div>
+            <div class="col-md-4">
+                <label for="inputRUN">RUN:</label>
+                <div class="d-flex">
+                    <input type="text" class="form-control mb-3" placeholder="Ingrese run" name="run" id="inputRun"
+                        maxlength="9">
+                    <p class="px-1">-</p>
+                    <input type="text" class="form-control mb-3" name="dv" id="inputDv" maxlength="1">
+                </div>
+            </div>
         </div>
-        
-        <div class="form-floating">
-            <select class="form-select" id="id_rol" name="id_rol" aria-label="Default select example" required>
-                <option selected disabled>Rol</option>
-                <option value="1" id="id_rol" name="id_rol">Admin</option>
-                <option value="2" id="id_rol" name="id_rol">Editor</option>
-                <option value="3" id="id_rol" name="id_rol">Visor</option>
-              </select>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="inputPosition">Cargo:</label>
+                <input type="text" class="form-control mb-3" placeholder="Ingrese cargo" name="position"
+                    id="inputPosition">
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="inputRole">Rol:</label>
+                    <select class="form-control" id="inputRole" name="role_id">
+                        <option value="1">Admin</option>
+                        <option value="2">Editor</option>
+                        <option value="3">Visor</option>
+                        <option value="4">Recursos</option>
+                        <option value="5">Comprador</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        <button class="w-100 btn-submit btn-lg btn-primary" type="submit">Agregar</button>
+        <button type="submit" class="btn btn-primary text-right">Agregar Usuario</button>
     </form>
 </main>
 {% endblock %}

@@ -9,7 +9,7 @@ app = Flask(__name__,template_folder='templates')
 
 db= MySQL(app)
 
-'''
+
 def login_required(role_id):
     def wrapper(func):
         @wraps(func)
@@ -19,7 +19,7 @@ def login_required(role_id):
             return func(*args, **kwargs)
         return decorated_function
     return wrapper
-'''
+
 @app.before_request
 def before_request():
     # La función get_logged_in_user() obtiene el usuario actual de la sesión
@@ -38,24 +38,14 @@ def get_logged_in_user():
 @app.route('/')
 def index():
     return render_template('login.html')
-'''
-@app.route('/admin',  methods=["GET", "POST"])
-@login_required(role_id=1)
-def admin():
-    session['user_data'] = session.get('user_data') or {}
-    return redirect(url_for('inventario', role='admin'))
 
-@app.route('/visor')
-#@login_required(role_id=3)
-def visor():
-    session['user_data'] = session.get('user_data') or {}
-    return redirect(url_for('home', role='visor'))
 
-@app.route('/editor')
-#@login_required(role_id=2)
+
+@app.route('/comprador')
+@login_required(role_id=5)
 def editor():
     session['user_data'] = session.get('user_data') or {}
-    return redirect(url_for('inventario', role='editor'))'''
+    return redirect(url_for('', role='editor'))
 
 @app.route('/access-login', methods=["GET", "POST"])
 def login():
@@ -84,15 +74,17 @@ def login():
             
             elif session['role_id'] == 3:
                 return redirect(url_for('home'))
+            
+            elif session['role_id'] == 4:
+                return redirect(url_for('home'))
+            
+            elif session['role_id'] == 5:
+                return redirect(url_for('home'))
         else:
             return render_template('login.html', mensaje="Usuario o contraseña incorrecta")
     return redirect('/')
 
-#cerrar sesion
-'''@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')'''
+
 @app.route('/logout')
 def logout():
     session.pop('loggedin', None)
@@ -130,7 +122,6 @@ def show_prod():
             elif sort_by == 'categoria':
                 order_by_clause = 'ORDER BY categoria'
 
-            # Realiza la consulta a la base de datos para obtener los productos ordenados
             cur = db.connection.cursor()
             cur.execute(f'''SELECT p.*, c.cat_name AS categoria_nombre
                     FROM products p
@@ -179,33 +170,75 @@ def show_modifications():
         return redirect(url_for('login'))
 
 #MOSTRAR PROVEEDORES
+
 @app.route('/supplier')
 def show_supplier():
     if 'username' in session:
-        '''sort_by = request.args.get('sort_by')
+        sort_by = request.args.get('sort_by')
+        order_by = ''
+
         if sort_by:
-            if sort_by == 'first_name':
-                order_by = 'ORDER BY first_name'
-            elif sort_by == 'producto':
-                order_by = 'ORDER BY producto_nombre'
-            elif sort_by == 'id':
-                order_by = 'ORDER BY id'
-            elif sort_by == 'nro_serie':
-                order_by = 'ORDER BY nro_serie'
-            elif sort_by == 'fecha':
-                order_by = 'ORDER BY fecha_hora DESC'
-        else:
-            order_by = 'ORDER BY fecha_hora DESC'''
-        
+            if sort_by == 'supp_id':
+                order_by = 'ORDER BY supp_id'
+            elif sort_by == 'supp_name':
+                order_by = 'ORDER BY supp_name'
+            elif sort_by == 'start_cont':
+                order_by = 'ORDER BY start_cont'
+            elif sort_by == 'renew_cont':
+                order_by = 'ORDER BY renew_cont'
+            elif sort_by == 'transactions':
+                order_by = 'ORDER BY transactions'
+            elif sort_by == 'description':
+                order_by = 'ORDER BY description'
+         
+
         cur = db.connection.cursor()
-        cur.execute(f'''SELECT * 
-                    FROM supplier''')
+    
+        if order_by:
+            cur.execute(f'SELECT * FROM supplier {order_by}')
+        else:
+            cur.execute('SELECT * FROM supplier ORDER BY start_cont DESC') 
         proveedores = cur.fetchall()
         cur.close()
-        return render_template('supplier.html', first_name=session['first_name'],proveedores=proveedores)
+        
+        return render_template('supplier.html', first_name=session['first_name'], proveedores=proveedores)
     else:
         return redirect(url_for('login'))
 
+#Buscar proveedor
+@app.route('/buscar-proveedor', methods=['POST'])
+def buscar_proveedor():
+    if 'username' in session:
+        search_query = request.form.get('search_query', '').strip()
+        
+        if not search_query:
+            return redirect(url_for('show_supplier')) 
+        
+        cur = db.connection.cursor()
+        cur.execute(f"""
+            SELECT * 
+            FROM supplier 
+            WHERE supp_name LIKE %s 
+               OR supp_id LIKE %s 
+               OR start_cont LIKE %s 
+               OR renew_cont LIKE %s 
+               OR address LIKE %s 
+               OR contact LIKE %s 
+               OR fono LIKE %s 
+               OR transactions LIKE %s 
+               OR description LIKE %s
+        """, ('%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%', 
+              '%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%', 
+              '%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%'))
+        
+        proveedores = cur.fetchall()
+        cur.close()
+        
+        return render_template('supplier.html', first_name=session['first_name'], proveedores=proveedores)
+    else:
+        return redirect(url_for('login'))
+
+    
 #Generar contraseña
 def generate_password():
     import string
@@ -215,8 +248,8 @@ def generate_password():
     password = ''.join(random.choice(characters) for i in range(8))  # Genera una contraseña de 8 caracteres
     return password
 
-#Mostrar usuarios
 @app.route('/users', methods=["GET", "POST"])
+@login_required(role_id=1) 
 def show_users():
 
     if 'username' in session:
@@ -228,50 +261,50 @@ def show_users():
     else:
         return redirect(url_for('login'))
 
-
-#Registro usuarios
+# Registro usuarios
 @app.route('/add_user', methods=["POST"])
-#@login_required(role_id=1) 
+@login_required(role_id=1) 
 def add_user():
     if request.method == "POST":
-        if request.method == 'POST':
-            if 'id_rol' not in request.form:
-                flash('El campo "Rol" es obligatorio.', 'danger')
-                return render_template('register.html')
-            
-            role_id = request.form['id_rol']
-            first_name = request.form['first_name']
-            last_name = request.form['last_name']
-            run = request.form['run']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        run = request.form['run']
+        dv = request.form['dv']
+        role_id = request.form['role_id']
+        position = request.form['position']
 
-            # Verificar si se han dejado campos en blanco
-            if not first_name or not last_name or not run:
-                flash('Por favor, completa todos los campos.', 'danger')
-                return render_template('register.html')
-            try:
-                rut = format_rut(run)
-            except ValueError as e:
-                flash(str(e))
-                return redirect(url_for('registro'))
-        
-            password = generate_password()
-
-            #Creacion del nombre de usuario con 3 primeras letras del nombre y apellido completo
-            username = f"{first_name[:3].lower()}.{last_name.lower()}"
-            
-            cur = db.connection.cursor()
-            cur.execute('INSERT INTO users(role_id, username, password, first_name, last_name, run) VALUES(%s,%s,%s,%s,%s,%s)',
-                        (role_id,username,password,first_name, last_name, rut))
-            db.connection.commit()
-            cur.close()
-
-            flash('Usuario creado!', 'success')
+      
+        if not first_name or not last_name or not run:
+            flash('Por favor, completa todos los campos.', 'danger')
             return render_template('register.html')
-        return render_template('register.html')
+
+        try:
+            rut = format_rut(run)
+        except ValueError as e:
+            flash(str(e), 'danger')
+            return redirect(url_for('registro'))
+
+        first_name_lower = first_name.lower()
+        last_name_lower = last_name.lower()
+
+        
+        username = f"{first_name_lower[:3]}.{last_name_lower}"
+        password = generate_password()
+
+   
+        cur = db.connection.cursor()
+        cur.execute("INSERT INTO users (username, first_name, last_name, run, dv, password, position, role_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (username, first_name, last_name, run, dv, password, position, role_id))
+        db.connection.commit()
+        cur.close()
+
+        flash('Usuario creado!', 'success')
+
+    return render_template('register.html')
 
 #Agregar producto
 @app.route('/add_product')
-#@login_required(role_id=2) 
+@login_required(role_id=2) 
 def add_product():
     if request.method == 'POST':
             if 'addCategory' not in request.form:
@@ -286,8 +319,8 @@ def add_product():
             category = request.form['addCategory']
             img = request.form['addImg']
 
-            # Verificar si se han dejado campos en blanco
-            if not name or not desc or not precio or not supplier or not stock:
+          
+            if not name or not desc or not price or not supplier or not stock:
                 flash('Por favor, completa todos los campos.', 'danger')
                 return redirect(url_for('show_prod'))
 
@@ -303,9 +336,40 @@ def add_product():
         
     return redirect(url_for('show_prod'))
 
+
+@app.route('/add-supplier', methods=['POST'])
+@login_required(role_id=1)
+def add_supplier():
+    if request.method == 'POST':
+        name = request.form['addName']
+        contact = request.form['addContact']
+        contract = request.form['addContract']
+        reNew = request.form['addRenew']
+        transactions = request.form['addTransaction']
+        address = request.form['addAddress']
+        fono = request.form['addFono']
+        description = request.form['addDescription']
+        
+        if not name or not contact or not contract or not reNew or not transactions or not address or not fono or not description:
+            flash('Por favor, completa todos los campos.', 'danger')
+            return redirect(url_for('supplier'))  
+        
+        
+        cur = db.connection.cursor()
+        cur.execute('INSERT INTO supplier(supp_name, start_cont, renew_cont, address, contact, fono, transactions, description) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)',
+                    (name, contract, reNew, address, contact, fono, transactions, description))
+        db.connection.commit()
+        cur.close()
+
+        flash('Proveedor agregado correctamente.', 'success')
+        return redirect(url_for('supplier')) 
+    return redirect(url_for('supplier'))
+
+
+
 #Editar producto
 @app.route('/edit_product')
-#@login_required(role_id=2) 
+@login_required(role_id=2) 
 def edit_product(id):
 
             name = request.form['editName']
@@ -351,48 +415,40 @@ def format_rut(run):
     formatted_rut = f"{rut_str[:-7]}.{rut_str[-7:-4]}.{rut_str[-4:-1]}-{rut_str[-1]}"
     return formatted_rut
 
-# EDITAR USUARIOS POR PARTE DEL ADMIN
+
 @app.route('/edit_user/<int:user_id>', methods=["POST"])
-#@login_required(role_id=1)  
+@login_required(role_id=1)  
 def edit_user(user_id):
     if request.method == "POST":
-        id_rol = request.form['editIdRol']
         username = request.form['editUsername']
-        first_name = request.form['editName']
+        first_name = request.form['editFirstName']
         last_name = request.form['editLastName']
-        run = request.form['editRut']
+        run = request.form['editRun']
+        dv = request.form['editDv']
+        password = request.form['editPassword']
+        position = request.form['editPosition']
+        id_role = request.form['editIdRole']
 
-        try:
-            rut = format_rut(run)
-        except ValueError as e:
-            flash(str(e))
-            return redirect(url_for('show_users'))
 
-        #Generar nueva contraseña
-        generate_password_flag = request.form.get('generatePassword')
-        if generate_password_flag:
-            password = generate_password()
-            cur = db.connection.cursor()
-            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s, password = %s WHERE user_id = %s',
-                    (id_rol, username, first_name, last_name, run, password, user_id))
-        else:
-            cur = db.connection.cursor()
-            cur.execute('UPDATE users SET role_id = %s, username = %s, first_name = %s, last_name = %s, run = %s WHERE user_id = %s',
-                (id_rol, username, first_name, last_name, rut, user_id))
-            
+        cur = db.connection.cursor()
+        cur.execute("UPDATE users SET username = %s, first_name = %s, last_name = %s, run = %s, dv = %s, password = %s, position  = %s, role_id = %s WHERE user_id = %s",
+                    (username, first_name, last_name, run, dv, password, position, id_role, user_id))
+       
+
         db.connection.commit()
         cur.close()
 
         flash(f'Usuario {first_name} Modificado!')
         return redirect(url_for('show_users'))
 
+
 # ELIMINAR USUARIOS POR PARTE DEL ADMIN
 @app.route('/delete_user/<int:user_id>', methods=["POST"])
-#@login_required(role_id=1)  
+@login_required(role_id=1)  
 def delete_user(user_id):
-    cur = mysql.connection.cursor()
+    cur = db.connection.cursor()
     cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
-    mysql.connection.commit()
+    db.connection.commit()
     cur.close()
     return redirect('/users')
 

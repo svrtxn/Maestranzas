@@ -1,74 +1,100 @@
 {% extends 'layouts/base-user.html' %}
 
-{% block title %}Modificaciones{% endblock %}
+{% block title %}Proveedores{% endblock %}
 
-{% block customCSS %} 
+{% block customCSS %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/general.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/proveedor.css') }}">
 {% endblock %}
 
 {% block body %}
 <main>
-    <header>            
+    <header>
         <h2 class="pb-3 pt-2">PROVEEDORES</h2>
-        
+
         <div class="search">
-            <form action="/buscar-modificacion" method="POST" class="d-flex mb-2 search" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar modificación" aria-label="Search" name="search_query">
+            <form action="{{ url_for('buscar_proveedor') }}" method="POST" class="d-flex mb-2 search" role="search">
+                <input class="form-control me-2" type="search" placeholder="Buscar proveedor" aria-label="Search"
+                    name="search_query">
             </form>
         </div>
-                    
-        <div class="dropdown-product ">
-            <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownProduct2" data-bs-toggle="dropdown" aria-expanded="false"> 
+
+
+        <div class="dropdown-product">
+            <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownProduct2"
+                data-bs-toggle="dropdown" aria-expanded="false">
                 <strong>Ordenar por:</strong>
             </a>
             <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownProduct2">
-                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='id') }}">ID</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='nro_serie') }}">N° serie</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='producto') }}">Producto</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='first_name') }}">Responsable</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='fecha') }}">Fecha y Hora</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='supp_id') }}">ID del
+                        Proveedor</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='supp_name') }}">Nombre del
+                        Proveedor</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='start_cont') }}">Inicio de
+                        Contrato</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('show_supplier', sort_by='renew_cont') }}">Renovación de
+                        Contrato</a></li>
+                <li><a class="dropdown-item"
+                        href="{{ url_for('show_supplier', sort_by='transactions') }}">Transacciones</a></li>
+                <li><a class="dropdown-item"
+                        href="{{ url_for('show_supplier', sort_by='description') }}">Descripción</a></li>
             </ul>
         </div>
-    </header>
 
-    {% if g.user and g.user['role_id'] == 1 %}
+
+        {% if g.user and g.user['role_id'] == 1 %}
         <div class="btn-agregar-p">
-            <button type="button" class="btn btn-success" id="btn-agregar" data-bs-toggle="modal" data-bs-target="#addProvModal">
+            <button type="button" class="btn btn-success" id="btn-agregar" data-bs-toggle="modal"
+                data-bs-target="#addProvModal">
                 Añadir Proveedor
             </button>
         </div>
         {% endif %}
+    </header>
 
-        <div class="table-responsive mt-4">
+
+
+    <div class="table-responsive mt-4">
         {% if proveedores %}
-        {% if g.user and g.user['role_id'] == 1  %}
-                {% with messages = get_flashed_messages() %}    
-                {% if messages %}
-                <br>
-                    {% for message in messages %}
-                        <div class="alert alert-warning alert-dissmissible" role="alert">
-                            <strong>{{ message }}</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                {% endwith %}
-            {% endif %}   
+        {% if g.user and g.user['role_id'] == 1 %}
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <br>
+        {% for message in messages %}
+        <div class="alert alert-warning alert-dissmissible" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% endif %}
         <table class="table" id="proveedor-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Empresa</th>
-                    <th>Producto</th>
+                    <th>#</th>
+                    <th>Nombre empresa</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Inicio Contrato</th>
+                    <th>Renovación contrato</th>
+                    <th>Transacciones</th>
+                    <th>Dirección</th>
+                    <th>Descripción</th>
                 </tr>
             </thead>
             <tbody>
                 {% for p in proveedores %}
                 <tr>
-                    <td>{{ mod.id }}</td>
-                    <td>{{ mod.nro_serie }}</td>
-                    <td>{{ mod.producto_nombre }}</td>
+                    <td>{{ p.supp_id }}</td>
+                    <td>{{ p.supp_name }}</td>
+                    <td>{{ p.contact }}</td>
+                    <td>{{ p.fono }}</td>
+                    <td>{{ p.start_cont }}</td>
+                    <td>{{ p.renew_cont }}</td>
+                    <td>{{ p.transactions }}</td>
+                    <td>{{ p.address }}</td>
+                    <td>{{ p.description }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -77,31 +103,64 @@
         <p>No hay Proveedores registrados.</p>
         {% endif %}
     </div>
-    <!--MODAL AGREGAR PROVEEDOR-->
-    <div class="modal fade" id="addProvModal" tabindex="-1"aria-labelledby="exampleModalLabel2" aria-hidden="true">
+    <!-- MODAL AGREGAR PROVEEDOR -->
+    <div class="modal fade" id="addProvModal" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel2">Añadir Proveedor</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/agregar_proveedor" method="POST">
+                    <form action="/add-supplier" method="POST">
+                        <div class="col-md-12">
+                            <label for="addName" class="form-label">Nombre empresa:</label>
+                            <input type="text" class="form-control" id="addName" name="addName" required>
+                        </div>
+                        <div class="row mb-3">
+
+                            <div class="col-md-6">
+                                <label for="addContact" class="form-label">Contacto:</label>
+                                <input type="text" class="form-control" id="addContact" name="addContact" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="addFono" class="form-label">Teléfono:</label>
+                                <input type="text" class="form-control" id="addFono" name="addFono" required>
+                            </div>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="addNombre" class="form-label">Nombre empresa:</label>
-                                <input type="text" class="form-control" id="addNombre" name="addNombre" required>
+                                <label for="addContract" class="form-label">Contrato:</label>
+                                <input type="text" class="form-control" id="addContract" name="addContract" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="addRenew" class="form-label">Renovación de contrato:</label>
+                                <input type="text" class="form-control" id="addRenew" name="addRenew" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="addDescripcion" class="form-label">Descripcion:</label>
-                                <input type="text" class="form-control" id="addDescripcion" name="addDescripcion" required>
+                                <label for="addTransaction" class="form-label">Transacciones:</label>
+                                <input type="text" class="form-control" id="addTransaction" name="addTransaction"
+                                    required>
                             </div>
-                        </div>          
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                        <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">Cancelar</button>
+                            <div class="col-md-6">
+                                <label for="addAddress" class="form-label">Dirección:</label>
+                                <input type="text" class="form-control" id="addAddress" name="addAddress" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="addDescription" class="form-label">Descripción:</label>
+                                <textarea class="form-control" id="addDescription" name="addDescription" rows="4"
+                                    style="width: 100%;" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
 </main>
 {% endblock %}

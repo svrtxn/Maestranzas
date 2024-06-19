@@ -16,17 +16,20 @@ CREATE TABLE IF NOT EXISTS `roles` (
 INSERT INTO `roles` (`role_id`, `name`) VALUES
 (1, 'admin'),
 (2, 'editor'),
-(3, 'visor');
+(3, 'visor'),
+(4, 'resource')
+(5, 'buyer');
 
 CREATE TABLE IF NOT EXISTS `supplier` (
-  `supp_id` int(30) NOT NULL,
+  `supp_id` int(30) AUTO_INCREMENT PRIMARY KEY,
   `supp_name` varchar(255) NOT NULL,
-  `start_cont` varchar(255) NOT NULL,
-  `renew_cont` varchar(255) NOT NULL,
+  `start_cont` DATE NOT NULL,
+  `renew_cont` DATE NOT NULL,
   `address` varchar(255) NOT NULL,
   `contact` varchar(255) NOT NULL,
+  `fono` INT NOT NULL,
   `transactions` varchar(255) NOT NULL,
-  PRIMARY KEY (`supp_id`)
+  `description` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -53,27 +56,31 @@ INSERT INTO `categories` (`cat_id`, `cat_name`) VALUES
 -- DENTRO DE LA SENTENCIA SQL DE LA BBDD
 -------------------------------------------------------------------------------------------------------- 
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `run` varchar(12) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`),
-  KEY `role_id` (`role_id`),
-  CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CREATE TABLE IF NOT EXISTS `users` (
+    `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `username` varchar(255) NOT NULL,
+    `first_name` varchar(255) NOT NULL,
+    `last_name` varchar(255) NOT NULL,
+    `run` varchar(9) NOT NULL,
+    `dv` varchar(1) NOT NULL,
+    `password` varchar(255) NOT NULL,
+    `position` varchar(255) NOT NULL,
+    `role_id` int(11) NOT NULL,
+    PRIMARY KEY (`user_id`),
+    KEY `role_id` (`role_id`),
+    CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --------------------------------------------------------------------------------------------------------
 -- EJECUTAR ESTA SECCIÓN TERCERO
 -------------------------------------------------------------------------------------------------------- 
 
-INSERT INTO `users` (`user_id`,`username`, `first_name`, `last_name`, `run`, `password`, `role_id`) VALUES
-('','admin', 'admin', 'admin', '111111111', 'admin', 1),
-('','editor', 'editor', 'editor', '222222222', 'editor', 2),
-('','visor', 'visor', 'visor', '3333333333', 'visor', 3);
+INSERT INTO `users` (`user_id`,`username`, `first_name`, `last_name`, `run`, `dv`, `password`, `position`, `role_id`) VALUES
+('1','admin', 'admin', 'admin', '11111111', '1','admin', 'Administrador',1),
+('2','editor', 'editor', 'editor', '22222222', '2', 'editor', 'Editor', 2),
+('3','visor', 'visor', 'visor', '333333333', '3', 'visor', 'Visor',3),
+('4','resource', 'resource', 'resource', '44444444', '4','resource', 'Recursos',4);
+
 
 --------------------------------------------------------------------------------------------------------
 -- EJECUTAR ESTA SECCIÓN CUARTO
@@ -107,3 +114,38 @@ CREATE TABLE IF NOT EXISTS `products` (
   CONSTRAINT `fk_supplier_id` FOREIGN KEY (`supplier`) REFERENCES `supplier` (`supp_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_category_id` FOREIGN KEY (`category`) REFERENCES `categories` (`cat_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-------------------------------
+
+EJECUTAR SEXTO
+------
+
+-- Insertar proveedores 
+INSERT INTO supplier (supp_name, start_cont, renew_cont, address, contact, fono, transactions, description)
+VALUES 
+    ('Ferretería El Martillo', '2023-10-01', '2024-01-01', 'Calle Ejemplo 123, Santiago, Chile', 'Juan Pérez', '923452678', 100, 'Proveedor de herramientas manuales.'),
+    ('ElectroHerramientas S.A.', '2023-11-01', '2024-02-01', 'Av. Principal 456, Valparaíso, Chile', 'María González', '928765432', 150, 'Proveedor de herramientas eléctricas.'),
+    ('Jardines Verdes Ltda.', '2023-12-01', '2024-03-01', 'Ruta Jardinera 789, Viña del Mar, Chile', 'Pedro Torres', '987654321', 80, 'Proveedor de productos para jardinería.'),
+    ('ConstruMateriales SPA', '2024-01-01', '2024-04-01', 'Av. Obras 101, Concepción, Chile', 'Ana López', '941326789', 120, 'Proveedor de materiales de construcción.'),
+    ('Fijaciones Rápidas Limitada', '2024-02-01', '2024-05-01', 'Calle Segura 210, Antofagasta, Chile', 'José Rodríguez', '967890123', 90, 'Proveedor de productos de fijación.'),
+    ('ElectroSuministros Chile', '2024-03-01', '2024-06-01', 'Av. Energía 567, Arica, Chile', 'Luisa Martínez', '934567890', 110, 'Proveedor de suministros eléctricos.'),
+    ('Pinturas y Acabados Modernos', '2024-04-01', '2024-07-01', 'Calle Colorida 789, La Serena, Chile', 'Roberto Soto', '989012345', 70, 'Proveedor de pinturas y productos de acabado.'),
+    ('Fontanería Aguas Claras', '2024-05-01', '2024-08-01', 'Av. Agua Limpia 345, Rancagua, Chile', 'Marcela Díaz', '967890123', 130, 'Proveedor de productos de fontanería.'),
+    ('Decoraciones Bella Vista', '2024-06-01', '2024-09-01', 'Calle Decorativa 678, Temuco, Chile', 'Carlos Silva', '990123456', 85, 'Proveedor de productos de decoración.');
+
+-- Insertar usuarios
+INSERT INTO `users` (`username`, `first_name`, `last_name`, `run`, `dv`, `password`, `position`, `role_id`)
+VALUES 
+    ('Jua.Per', 'Juan', 'Pérez', '7774281', '6', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Gerente de Proyectos', 4),
+    ('Mar.Gon', 'María', 'González', '7839670', '9', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Auditor de Inventario', 2),
+    ('Lui.Rod', 'Luis', 'Rodríguez', '8575182', '4', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Comprador', 3),
+    ('Ana.Mar', 'Ana', 'Martínez', '9913728', '2', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Administrador del Sistema', 1),
+    ('Car.San', 'Carlos', 'Sánchez', '13734758', 'K', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Trabajador Planta', 3),
+    ('Lau.Gom', 'Laura', 'Gómez', '13736224', '4', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Jefe de Producción', 2),
+    ('Jav.Dia', 'Javier', 'Díaz', '17057290', '4', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Encargado de Logística', 3),
+    ('Pau.Fer', 'Paula', 'Fernández', '21261393', '2', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Gestor de Inventario', 3),
+    ('Die.Lop', 'Diego', 'López', '22571611', '0', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Comprador', 3),
+    ('Val.Tor', 'Valentina', 'Torres', '25902327', '0', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Trabajador Planta', 3),
+    ('And.Ram', 'Andrés', 'Ramírez', '29623924', '0', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Comprador', 3),
+    ('Sof.Rui', 'Sofía', 'Ruiz', '32746889', '8', SUBSTRING(MD5(RAND()) FROM 1 FOR 10), 'Trabajador Planta', 3);
